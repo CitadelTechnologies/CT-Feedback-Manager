@@ -152,4 +152,36 @@ var routes = Routes{
 					controller.GetFeedbackComments(w, r, "evolutions")
 				},
     },
+    Route{
+        "Create Label",
+        "POST",
+        "/labels",
+        func (w http.ResponseWriter, r *http.Request) {
+					controller.CreateLabel(w, r)
+				},
+    },
+    Route{
+        "Update Label",
+        "PUT",
+        "/labels/{id}",
+        func (w http.ResponseWriter, r *http.Request) {
+					controller.UpdateLabel(w, r)
+				},
+    },
+    Route{
+        "Delete Label",
+        "DELETE",
+        "/labels/{id}",
+        func (w http.ResponseWriter, r *http.Request) {
+					controller.DeleteLabel(w, r)
+				},
+    },
+    Route{
+        "Get Labels",
+        "GET",
+        "/labels",
+        func (w http.ResponseWriter, r *http.Request) {
+					controller.GetLabels(w, r)
+				},
+    },
 }
