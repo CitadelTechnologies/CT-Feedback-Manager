@@ -77,6 +77,18 @@ var routes = Routes{
         controller.UpdateBug,
     },
     Route{
+        "Add Label to Bug",
+        "POST",
+        "/bugs/{feedback_id}/labels/{label_id}",
+        controller.AddLabelToBug,
+    },
+    Route{
+        "Remove Label from Bug",
+        "DELETE",
+        "/bugs/{feedback_id}/labels/{label_id}",
+        controller.RemoveLabelFromBug,
+    },
+    Route{
         "Delete Bug",
         "DELETE",
         "/bugs/{id}",
@@ -137,6 +149,18 @@ var routes = Routes{
 				},
     },
     Route{
+        "Add Label to Evolution",
+        "POST",
+        "/evolutions/{feedback_id}/labels/{label_id}",
+        controller.AddLabelToEvolution,
+    },
+    Route{
+        "Remove Label from Evolution",
+        "DELETE",
+        "/evolutions/{feedback_id}/labels/{label_id}",
+        controller.RemoveLabelFromEvolution,
+    },
+    Route{
         "Delete Evolution Comment",
         "DELETE",
         "/evolutions/{id}/comments/{comment_id}",
@@ -150,6 +174,38 @@ var routes = Routes{
         "/evolutions/{id}/comments",
         func (w http.ResponseWriter, r *http.Request) {
 					controller.GetFeedbackComments(w, r, "evolutions")
+				},
+    },
+    Route{
+        "Create Label",
+        "POST",
+        "/labels",
+        func (w http.ResponseWriter, r *http.Request) {
+					controller.CreateLabel(w, r)
+				},
+    },
+    Route{
+        "Update Label",
+        "PUT",
+        "/labels/{id}",
+        func (w http.ResponseWriter, r *http.Request) {
+					controller.UpdateLabel(w, r)
+				},
+    },
+    Route{
+        "Delete Label",
+        "DELETE",
+        "/labels/{id}",
+        func (w http.ResponseWriter, r *http.Request) {
+					controller.DeleteLabel(w, r)
+				},
+    },
+    Route{
+        "Get Labels",
+        "GET",
+        "/labels",
+        func (w http.ResponseWriter, r *http.Request) {
+					controller.GetLabels(w, r)
 				},
     },
 }

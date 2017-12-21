@@ -10,26 +10,23 @@ import(
 )
 
 /*
-* GET request to get all feedback comments
+* GET request to get all labels
 */
-func GetFeedbackComments(w http.ResponseWriter, r *http.Request, collectionName string) {
-  	vars := mux.Vars(r)
-
-    comments := manager.GetFeedbackComments(vars["id"], collectionName)
+func GetLabels(w http.ResponseWriter, r *http.Request) {
+    labels := manager.GetLabels()
 
   	w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
-  	if err := json.NewEncoder(w).Encode(comments); err != nil {
+  	if err := json.NewEncoder(w).Encode(labels); err != nil {
       panic(err)
     }
 }
 
 /*
-* POST request to create a new Evolution object
+* POST request to create a new Label object
 */
-func CreateComment(w http.ResponseWriter, r *http.Request, collectionName string) {
-	vars := mux.Vars(r)
+func CreateLabel(w http.ResponseWriter, r *http.Request) {
   var body []byte
   var err error
 	if body, err = ioutil.ReadAll(io.LimitReader(r.Body, 1048576)); err != nil {
@@ -38,7 +35,7 @@ func CreateComment(w http.ResponseWriter, r *http.Request, collectionName string
 	if err = r.Body.Close(); err != nil {
     panic(err)
   }
-  var data map[string]interface{}
+  var data map[string]string
 	if err = json.Unmarshal(body, &data); err != nil {
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(http.StatusUnprocessableEntity)
@@ -47,24 +44,22 @@ func CreateComment(w http.ResponseWriter, r *http.Request, collectionName string
 		}
 	}
 
-  comment := manager.CreateComment(
-    vars["id"],
-		data["content"].(string),
-		data["author"].(map[string]interface{}),
-    collectionName,
+  label := manager.CreateLabel(
+		data["name"],
+		data["color"],
 	)
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusCreated)
-	if err = json.NewEncoder(w).Encode(&comment); err != nil {
+	if err = json.NewEncoder(w).Encode(&label); err != nil {
     panic(err)
   }
 }
 
 /*
-* PUT request to update a comment by its ID
+* PUT request to update a label by its ID
 */
-func UpdateComment(w http.ResponseWriter, r *http.Request, collectionName string) {
+func UpdateLabel(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
 	var body []byte
@@ -75,7 +70,7 @@ func UpdateComment(w http.ResponseWriter, r *http.Request, collectionName string
 	if err = r.Body.Close(); err != nil {
     panic(err)
   }
-  var data map[string]interface{}
+  var data map[string]string
 	if err = json.Unmarshal(body, &data); err != nil {
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(http.StatusUnprocessableEntity)
@@ -84,24 +79,24 @@ func UpdateComment(w http.ResponseWriter, r *http.Request, collectionName string
 		}
 	}
 
-  comment := manager.UpdateComment(vars["id"], vars["comment_id"], data, collectionName)
-  if comment == nil {
+  label := manager.UpdateLabel(vars["id"], data)
+  if label == nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	if err := json.NewEncoder(w).Encode(&comment); err != nil {
+	if err := json.NewEncoder(w).Encode(&label); err != nil {
     panic(err)
   }
 }
 
 /*
-* DELETE request to delete a comment by its ID
+* DELETE request to delete a label by its ID
 */
-func DeleteComment(w http.ResponseWriter, r *http.Request, collectionName string) {
+func DeleteLabel(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
-  if !manager.DeleteComment(vars["id"], vars["comment_id"], collectionName) {
+  if !manager.DeleteLabel(vars["id"]) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

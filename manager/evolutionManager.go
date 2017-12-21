@@ -12,6 +12,12 @@ func GetEvolutions() model.Evolutions {
   	if err := MongoDBConnection.DB(MongoDBName).C("evolutions").Find(nil).All(&evolutions); err != nil {
       panic(err)
     }
+		for key, evolution := range evolutions {
+			evolutions[key].Labels = make(model.Labels, 0)
+			for _, labelId := range evolution.LabelIds {
+				evolutions[key].Labels = append(evolutions[key].Labels, GetLabel(labelId.Hex()))
+			}
+		}
     return evolutions
 }
 
@@ -24,6 +30,9 @@ func GetEvolution(id string) *model.Evolution {
   	if err := MongoDBConnection.DB(MongoDBName).C("evolutions").FindId(bson.ObjectIdHex(id)).One(&evolution); err != nil {
       panic(err)
     }
+		for _, labelId := range evolution.LabelIds {
+			evolution.Labels = append(evolution.Labels, GetLabel(labelId.Hex()))
+		}
     return &evolution
 }
 
@@ -65,6 +74,38 @@ func UpdateEvolution(id string, data map[string]interface{}) *model.Evolution {
 		panic(err);
 	}
 	return &evolution
+}
+
+func AddLabelToEvolution(feedbackId string, label *model.Label) *model.Evolution {
+	evolution := GetEvolution(feedbackId)
+	if evolution == nil {
+		return nil
+	}
+	evolution.Labels = append(evolution.Labels, label)
+	evolution.LabelIds = append(evolution.LabelIds, label.Id)
+  change := bson.M{
+		"$push": bson.M{"labels": label.Id},
+		"$set": bson.M{"updatedat": time.Now()},
+	}
+  if err := MongoDBConnection.DB(MongoDBName).C("evolutions").Update(bson.M{"_id": bson.ObjectIdHex(feedbackId)}, change); err != nil {
+    panic(err)
+  }
+  return evolution
+}
+
+func RemoveLabelFromEvolution(feedbackId string, label *model.Label) *model.Evolution {
+	evolution := GetEvolution(feedbackId)
+	if evolution == nil {
+		return nil
+	}
+  change := bson.M{
+		"$pull": bson.M{"labels": label.Id},
+		"$set": bson.M{"updatedat": time.Now()},
+	}
+  if err := MongoDBConnection.DB(MongoDBName).C("evolutions").Update(bson.M{"_id": bson.ObjectIdHex(feedbackId)}, change); err != nil {
+    panic(err)
+  }
+  return evolution
 }
 
 func DeleteEvolution(id string) bool {

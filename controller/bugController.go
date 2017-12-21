@@ -15,6 +15,7 @@ import(
 func GetBugs(w http.ResponseWriter, r *http.Request) {
     bugs := manager.GetBugs()
 
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
   	w.Header().Set("Access-Control-Allow-Origin", "*")
 
   	if err := json.NewEncoder(w).Encode(bugs); err != nil {
@@ -33,6 +34,7 @@ func GetBug(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	if err := json.NewEncoder(w).Encode(bug); err != nil {
     panic(err)
   }
@@ -101,6 +103,37 @@ func UpdateBug(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	if err := json.NewEncoder(w).Encode(&bug); err != nil {
+    panic(err)
+  }
+}
+
+func AddLabelToBug(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+
+	label := manager.GetLabel(vars["label_id"])
+	if label == nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	bug := manager.AddLabelToBug(vars["feedback_id"], label)
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	if err := json.NewEncoder(w).Encode(&bug); err != nil {
+    panic(err)
+  }
+}
+
+func RemoveLabelFromBug(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+
+	label := manager.GetLabel(vars["label_id"])
+	if label == nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	bug := manager.RemoveLabelFromBug(vars["feedback_id"], label)
 	if err := json.NewEncoder(w).Encode(&bug); err != nil {
     panic(err)
   }
