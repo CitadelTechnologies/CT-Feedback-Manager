@@ -19,6 +19,7 @@ func GetEvolutions(w http.ResponseWriter, r *http.Request) {
     evolutions := manager.GetEvolutions()
 
   	w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
   	if err := json.NewEncoder(w).Encode(evolutions); err != nil {
       panic(err)
@@ -39,6 +40,7 @@ func GetEvolution(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	if err := json.NewEncoder(w).Encode(evolution); err != nil {
     panic(err)
   }
@@ -107,7 +109,38 @@ func UpdateEvolution(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	if err := json.NewEncoder(w).Encode(&evolution); err != nil {
+    panic(err)
+  }
+}
+
+func AddLabelToEvolution(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+
+	label := manager.GetLabel(vars["label_id"])
+	if label == nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	evolution := manager.AddLabelToEvolution(vars["feedback_id"], label)
+	if err := json.NewEncoder(w).Encode(&evolution); err != nil {
+    panic(err)
+  }
+}
+
+func RemoveLabelFromEvolution(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+
+	label := manager.GetLabel(vars["label_id"])
+	if label == nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	bug := manager.RemoveLabelFromEvolution(vars["feedback_id"], label)
+	if err := json.NewEncoder(w).Encode(&bug); err != nil {
     panic(err)
   }
 }

@@ -18,6 +18,7 @@ func GetFeedbackComments(w http.ResponseWriter, r *http.Request, collectionName 
     comments := manager.GetFeedbackComments(vars["id"], collectionName)
 
   	w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
   	if err := json.NewEncoder(w).Encode(comments); err != nil {
       panic(err)
@@ -88,6 +89,7 @@ func UpdateComment(w http.ResponseWriter, r *http.Request, collectionName string
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	if err := json.NewEncoder(w).Encode(&comment); err != nil {
     panic(err)
   }

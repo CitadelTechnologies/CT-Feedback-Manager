@@ -6,10 +6,10 @@ import(
 
 type(
   Label struct {
-    Id bson.ObjectId `json:"id"`
+    Id bson.ObjectId `json:"id" bson:"_id"`
     Name string `json:"name"`
     Color string `json:"color"`
   }
-  Labels []Label
+  Labels []*Label
   LabelIds []bson.ObjectId
 )

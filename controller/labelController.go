@@ -16,6 +16,7 @@ func GetLabels(w http.ResponseWriter, r *http.Request) {
     labels := manager.GetLabels()
 
   	w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
   	if err := json.NewEncoder(w).Encode(labels); err != nil {
       panic(err)
@@ -83,6 +84,7 @@ func UpdateLabel(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	if err := json.NewEncoder(w).Encode(&label); err != nil {
     panic(err)
   }

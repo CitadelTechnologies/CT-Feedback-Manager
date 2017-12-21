@@ -12,6 +12,12 @@ func GetBugs() model.Bugs {
   	if err := MongoDBConnection.DB(MongoDBName).C("bugs").Find(nil).All(&bugs); err != nil {
       panic(err)
     }
+		for key, bug := range bugs {
+			bugs[key].Labels = make(model.Labels, 0)
+			for _, labelId := range bug.LabelIds {
+				bugs[key].Labels = append(bugs[key].Labels, GetLabel(labelId.Hex()))
+			}
+		}
     return bugs
 }
 
@@ -27,6 +33,9 @@ func GetBug(id string) *model.Bug {
 			}
 			panic(err)
     }
+		for _, labelId := range bug.LabelIds {
+			bug.Labels = append(bug.Labels, GetLabel(labelId.Hex()))
+		}
     return &bug
 }
 
@@ -68,6 +77,38 @@ func UpdateBug(id string, data map[string]interface{}) *model.Bug {
 		panic(err);
 	}
 	return &bug
+}
+
+func AddLabelToBug(feedbackId string, label *model.Label) *model.Bug {
+	bug := GetBug(feedbackId)
+	if bug == nil {
+		return nil
+	}
+	bug.Labels = append(bug.Labels, label)
+	bug.LabelIds = append(bug.LabelIds, label.Id)
+  change := bson.M{
+		"$push": bson.M{"labels": label.Id},
+		"$set": bson.M{"updatedat": time.Now()},
+	}
+  if err := MongoDBConnection.DB(MongoDBName).C("bugs").Update(bson.M{"_id": bson.ObjectIdHex(feedbackId)}, change); err != nil {
+    panic(err)
+  }
+  return bug
+}
+
+func RemoveLabelFromBug(feedbackId string, label *model.Label) *model.Bug {
+	bug := GetBug(feedbackId)
+	if bug == nil {
+		return nil
+	}
+  change := bson.M{
+		"$pull": bson.M{"labels": label.Id},
+		"$set": bson.M{"updatedat": time.Now()},
+	}
+  if err := MongoDBConnection.DB(MongoDBName).C("bugs").Update(bson.M{"_id": bson.ObjectIdHex(feedbackId)}, change); err != nil {
+    panic(err)
+  }
+  return bug
 }
 
 func DeleteBug(id string) bool {

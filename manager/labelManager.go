@@ -14,6 +14,18 @@ func GetLabels() model.Labels {
     return labels
 }
 
+func GetLabel(id string) *model.Label {
+  	var label model.Label
+
+  	if !bson.IsObjectIdHex(id) {
+  		return nil
+  	}
+  	if err := MongoDBConnection.DB(MongoDBName).C("labels").FindId(bson.ObjectIdHex(id)).One(&label); err != nil {
+      return nil
+    }
+    return &label
+}
+
 func CreateLabel(name string, color string) model.Label {
   label := model.Label{
     Id: bson.NewObjectId(),

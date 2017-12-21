@@ -77,6 +77,18 @@ var routes = Routes{
         controller.UpdateBug,
     },
     Route{
+        "Add Label to Bug",
+        "POST",
+        "/bugs/{feedback_id}/labels/{label_id}",
+        controller.AddLabelToBug,
+    },
+    Route{
+        "Remove Label from Bug",
+        "DELETE",
+        "/bugs/{feedback_id}/labels/{label_id}",
+        controller.RemoveLabelFromBug,
+    },
+    Route{
         "Delete Bug",
         "DELETE",
         "/bugs/{id}",
@@ -135,6 +147,18 @@ var routes = Routes{
         func (w http.ResponseWriter, r *http.Request) {
 					controller.UpdateComment(w, r, "evolutions")
 				},
+    },
+    Route{
+        "Add Label to Evolution",
+        "POST",
+        "/evolutions/{feedback_id}/labels/{label_id}",
+        controller.AddLabelToEvolution,
+    },
+    Route{
+        "Remove Label from Evolution",
+        "DELETE",
+        "/evolutions/{feedback_id}/labels/{label_id}",
+        controller.RemoveLabelFromEvolution,
     },
     Route{
         "Delete Evolution Comment",
