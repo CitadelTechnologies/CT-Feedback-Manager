@@ -10,7 +10,7 @@ import(
 
 func GetBugs() model.Bugs {
   	bugs := make(model.Bugs, 0)
-  	if err := MongoDBConnection.DB(MongoDBName).C("bugs").Find(nil).All(&bugs); err != nil {
+  	if err := MongoDBConnection.DB(MongoDBName).C("bugs").Find(nil).Sort("-updatedat").All(&bugs); err != nil {
       panic(err)
     }
 		for key, bug := range bugs {

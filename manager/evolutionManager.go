@@ -10,7 +10,7 @@ import(
 
 func GetEvolutions() model.Evolutions {
   	evolutions := make(model.Evolutions, 0)
-  	if err := MongoDBConnection.DB(MongoDBName).C("evolutions").Find(nil).All(&evolutions); err != nil {
+  	if err := MongoDBConnection.DB(MongoDBName).C("evolutions").Find(nil).Sort("-updatedat").All(&evolutions); err != nil {
       panic(err)
     }
 		for key, evolution := range evolutions {
