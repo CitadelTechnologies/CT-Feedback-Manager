@@ -42,7 +42,10 @@ func CreateComment(feedbackId string, content string, author map[string]interfac
     CreatedAt: time.Now(),
     UpdatedAt: time.Now(),
   }
-  change := bson.M{"$push": bson.M{"comments": comment}}
+  change := bson.M{
+		"$set": bson.M{"updatedat": time.Now()},
+		"$push": bson.M{"comments": comment},
+	}
   if err := MongoDBConnection.DB(MongoDBName).C(collectionName).Update(bson.M{"_id": bson.ObjectIdHex(feedbackId)}, change); err != nil {
     panic(err)
   }
@@ -53,7 +56,7 @@ func UpdateComment(feedbackId string, commentId string, data map[string]interfac
 	var comment model.Comment
 
 	change := mgo.Change {
-		Update:    bson.M{"$inc": bson.M{"n": 1}, "$set": bson.M{
+		Update:    bson.M{"$set": bson.M{
 			"content": data["name"].(string),
 			"updatedat": time.Now(),
 		}},
