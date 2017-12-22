@@ -7,6 +7,7 @@ import(
 type Feedback struct {
   Author Author `json:"author"`
   Title string `json:"title"`
+  Slug string `json:"slug"`
   Description string `json:"description"`
   Labels Labels `json:"labels" bson:"-"`
   LabelIds LabelIds `json:"-" bson:"labels"`

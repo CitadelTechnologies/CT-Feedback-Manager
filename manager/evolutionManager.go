@@ -1,6 +1,7 @@
 package manager
 
 import(
+	"github.com/gosimple/slug"
 	"ct-feedback-manager/model"
 	"time"
 	"gopkg.in/mgo.v2/bson"
@@ -23,12 +24,15 @@ func GetEvolutions() model.Evolutions {
 
 func GetEvolution(id string) *model.Evolution {
   	var evolution model.Evolution
+		var identifier bson.M
 
-  	if !bson.IsObjectIdHex(id) {
-  		return nil
-  	}
-  	if err := MongoDBConnection.DB(MongoDBName).C("evolutions").FindId(bson.ObjectIdHex(id)).One(&evolution); err != nil {
-      panic(err)
+  	if bson.IsObjectIdHex(id) {
+			identifier = bson.M{"_id": bson.ObjectIdHex(id)}
+		} else {
+			identifier = bson.M{"slug": id}
+		}
+  	if err := MongoDBConnection.DB(MongoDBName).C("evolutions").Find(identifier).One(&evolution); err != nil {
+      return nil
     }
 		for _, labelId := range evolution.LabelIds {
 			evolution.Labels = append(evolution.Labels, GetLabel(labelId.Hex()))
@@ -36,14 +40,15 @@ func GetEvolution(id string) *model.Evolution {
     return &evolution
 }
 
-func CreateEvolution(title string, description string, status string, author map[string]interface{}) model.Evolution {
+func CreateEvolution(title string, description string, status string, author map[string]string) model.Evolution {
 	evolution := model.Evolution{
 		Id: bson.NewObjectId(),
 		Feedback: model.Feedback{
 	  	Title: title,
+			Slug: slug.Make(title),
 	  	Description: description,
 			Status: status,
-			Author: CreateAuthor(author["name"].(string), author["email"].(string)),
+			Author: CreateAuthor(author["name"], author["email"]),
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 		},
@@ -54,14 +59,15 @@ func CreateEvolution(title string, description string, status string, author map
   return evolution
 }
 
-func UpdateEvolution(id string, data map[string]interface{}) *model.Evolution {
+func UpdateEvolution(id string, data map[string]string) *model.Evolution {
 	var evolution model.Evolution
 
 	change := mgo.Change {
-		Update:    bson.M{"$inc": bson.M{"n": 1}, "$set": bson.M{
-			"title": data["title"].(string),
-			"description": data["description"].(string),
-			"status": data["status"].(string),
+		Update: bson.M{"$set": bson.M{
+			"title": data["title"],
+			"slug": slug.Make(data["title"]),
+			"description": data["description"],
+			"status": data["status"],
 			"updatedat": time.Now(),
 		}},
     Upsert:    false,

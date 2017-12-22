@@ -27,7 +27,7 @@ func GetEvolutions(w http.ResponseWriter, r *http.Request) {
 }
 
 /*
-* GET request to get a evolution by its ID
+* GET request to get a evolution by its ID or slug
 *
 * @param http.ResponseWriter w
 * @param http.Request r
@@ -71,7 +71,7 @@ func CreateEvolution(w http.ResponseWriter, r *http.Request) {
 		data["title"].(string),
 		data["description"].(string),
 		data["status"].(string),
-		data["author"].(map[string]interface{}),
+		data["author"].(map[string]string),
 	)
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
@@ -95,7 +95,7 @@ func UpdateEvolution(w http.ResponseWriter, r *http.Request) {
 	if err = r.Body.Close(); err != nil {
     panic(err)
   }
-  var data map[string]interface{}
+  var data map[string]string
 	if err = json.Unmarshal(body, &data); err != nil {
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(http.StatusUnprocessableEntity)

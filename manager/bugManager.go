@@ -1,6 +1,7 @@
 package manager
 
 import(
+	"github.com/gosimple/slug"
 	"ct-feedback-manager/model"
 	"time"
 	"gopkg.in/mgo.v2/bson"
@@ -23,11 +24,14 @@ func GetBugs() model.Bugs {
 
 func GetBug(id string) *model.Bug {
   	var bug model.Bug
+		var identifier bson.M
 
-  	if !bson.IsObjectIdHex(id) {
-  		return nil
-  	}
-  	if err := MongoDBConnection.DB(MongoDBName).C("bugs").FindId(bson.ObjectIdHex(id)).One(&bug); err != nil {
+		if bson.IsObjectIdHex(id) {
+			identifier = bson.M{"_id": bson.ObjectIdHex(id)}
+		} else {
+			identifier = bson.M{"slug": id}
+		}
+  	if err := MongoDBConnection.DB(MongoDBName).C("bugs").Find(identifier).One(&bug); err != nil {
       if err.Error() == "not found" {
 				return nil
 			}
@@ -39,14 +43,15 @@ func GetBug(id string) *model.Bug {
     return &bug
 }
 
-func CreateBug(title string, description string, status string, author map[string]interface{}) model.Bug {
+func CreateBug(title string, description string, status string, author map[string]string) model.Bug {
 	bug := model.Bug{
 		Id: bson.NewObjectId(),
 		Feedback: model.Feedback{
 		  Title: title,
+			Slug: slug.Make(title),
 		  Description: description,
 			Status: status,
-			Author: CreateAuthor(author["name"].(string), author["email"].(string)),
+			Author: CreateAuthor(author["name"], author["email"]),
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 		},
@@ -57,14 +62,15 @@ func CreateBug(title string, description string, status string, author map[strin
   return bug
 }
 
-func UpdateBug(id string, data map[string]interface{}) *model.Bug {
+func UpdateBug(id string, data map[string]string) *model.Bug {
 	var bug model.Bug
 
 	change := mgo.Change {
 		Update:    bson.M{"$inc": bson.M{"n": 1}, "$set": bson.M{
-			"title": data["title"].(string),
-			"description": data["description"].(string),
-			"status": data["status"].(string),
+			"title": data["title"],
+			"slug": slug.Make(data["title"]),
+			"description": data["description"],
+			"status": data["status"],
 			"updatedat": time.Now(),
 		}},
     Upsert:    false,
