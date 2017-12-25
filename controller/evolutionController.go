@@ -71,7 +71,7 @@ func CreateEvolution(w http.ResponseWriter, r *http.Request) {
 		data["title"].(string),
 		data["description"].(string),
 		data["status"].(string),
-		data["author"].(map[string]string),
+		data["author"].(map[string]interface{}),
 	)
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")

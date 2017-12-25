@@ -43,7 +43,7 @@ func GetBug(id string) *model.Bug {
     return &bug
 }
 
-func CreateBug(title string, description string, status string, author map[string]string) model.Bug {
+func CreateBug(title string, description string, status string, author map[string]interface{}) model.Bug {
 	bug := model.Bug{
 		Id: bson.NewObjectId(),
 		Feedback: model.Feedback{
@@ -51,7 +51,7 @@ func CreateBug(title string, description string, status string, author map[strin
 			Slug: slug.Make(title),
 		  Description: description,
 			Status: status,
-			Author: CreateAuthor(author["name"], author["email"]),
+			Author: CreateAuthor(author["name"].(string), author["email"].(string)),
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 		},

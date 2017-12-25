@@ -40,7 +40,7 @@ func GetEvolution(id string) *model.Evolution {
     return &evolution
 }
 
-func CreateEvolution(title string, description string, status string, author map[string]string) model.Evolution {
+func CreateEvolution(title string, description string, status string, author map[string]interface{}) model.Evolution {
 	evolution := model.Evolution{
 		Id: bson.NewObjectId(),
 		Feedback: model.Feedback{
@@ -48,7 +48,7 @@ func CreateEvolution(title string, description string, status string, author map
 			Slug: slug.Make(title),
 	  	Description: description,
 			Status: status,
-			Author: CreateAuthor(author["name"], author["email"]),
+			Author: CreateAuthor(author["name"].(string), author["email"].(string)),
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 		},
