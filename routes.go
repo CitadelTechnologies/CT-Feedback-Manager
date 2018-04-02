@@ -5,7 +5,9 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"ct-feedback-manager/controller"
+	"ct-feedback-manager/comment"
+	"ct-feedback-manager/feedback"
+	"ct-feedback-manager/label"
 )
 
 type(
@@ -19,193 +21,102 @@ type(
 )
 
 func NewRouter() *mux.Router {
-
     router := mux.NewRouter().StrictSlash(true)
     for _, route := range routes {
-			router.HandleFunc(route.Pattern, route.HandlerFunc).Methods(route.Method)
+		router.HandleFunc(route.Pattern, route.HandlerFunc).Methods(route.Method)
     }
     return router
 }
 
 var routes = Routes{
-		Route{
-				"Create Evolution",
-				"POST",
-				"/evolutions",
-				controller.CreateEvolution,
-		},
-		Route{
-				"Update Evolution",
-				"PUT",
-				"/evolutions/{id}",
-				controller.UpdateEvolution,
-		},
-		Route{
-				"Delete Evolution",
-				"DELETE",
-				"/evolutions/{id}",
-				controller.DeleteEvolution,
-		},
-		Route{
-				"Get Evolutions",
-				"GET",
-				"/evolutions",
-				controller.GetEvolutions,
-		},
-		Route{
-				"Get Evolution",
-				"GET",
-				"/evolutions/{id}",
-				controller.GetEvolution,
-		},
+	Route{
+		"Create Feedback",
+		"POST",
+		"/feedbacks",
+		feedback.CreateFeedbackAction,
+	},
+	Route{
+		"Update Feedback",
+		"PUT",
+		"/feedbacks/{id}",
+		feedback.UpdateFeedbackAction,
+	},
+	Route{
+		"Delete Feedback",
+		"DELETE",
+		"/feedbacks/{id}",
+		feedback.DeleteFeedbackAction,
+	},
+	Route{
+		"Get Feedbacks",
+		"GET",
+		"/feedbacks",
+		feedback.GetFeedbacksAction,
+	},
+	Route{
+		"Get Feedback",
+		"GET",
+		"/feedbacks/{id}",
+		feedback.GetFeedbackAction,
+	},
     Route{
-        "Bugs",
-        "GET",
-        "/bugs",
-        controller.GetBugs,
-    },
-    Route{
-        "Create Bug",
+        "Add Label to Feedback",
         "POST",
-        "/bugs",
-        controller.CreateBug,
+        "/feedbacks/{feedback_id}/labels/{label_id}",
+        feedback.AddLabelToFeedbackAction,
     },
     Route{
-        "Update Bug",
-        "PUT",
-        "/bugs/{id}",
-        controller.UpdateBug,
-    },
-    Route{
-        "Add Label to Bug",
-        "POST",
-        "/bugs/{feedback_id}/labels/{label_id}",
-        controller.AddLabelToBug,
-    },
-    Route{
-        "Remove Label from Bug",
+        "Remove Label from Feedback",
         "DELETE",
         "/bugs/{feedback_id}/labels/{label_id}",
-        controller.RemoveLabelFromBug,
+        feedback.RemoveLabelFromFeedbackAction,
     },
     Route{
-        "Delete Bug",
-        "DELETE",
-        "/bugs/{id}",
-        controller.DeleteBug,
-    },
-    Route{
-        "Get Bug",
-        "GET",
-        "/bugs/{id}",
-        controller.GetBug,
-    },
-    Route{
-        "Create Bug Comment",
+        "Create Feedback Comment",
         "POST",
-        "/bugs/{id}/comments",
-        func (w http.ResponseWriter, r *http.Request) {
-					controller.CreateComment(w, r, "bugs")
-				},
+        "/feedbacks/{id}/comments",
+        comment.CreateCommentAction,
     },
     Route{
-        "Update Bug Comment",
+        "Update Feedback Comment",
         "PUT",
-        "/bugs/{id}/comments/{comment_id}",
-        func (w http.ResponseWriter, r *http.Request) {
-					controller.UpdateComment(w, r, "bugs")
-				},
+        "/feedbacks/{id}/comments/{comment_id}",
+        comment.UpdateCommentAction,
     },
     Route{
-        "Delete Bug Comment",
+        "Delete Feedback Comment",
         "DELETE",
-        "/bugs/{id}/comments/{comment_id}",
-        func (w http.ResponseWriter, r *http.Request) {
-					controller.DeleteComment(w, r, "bugs")
-				},
+        "/feedbacks/{id}/comments/{comment_id}",
+        comment.DeleteCommentAction,
     },
     Route{
-        "Get Bug Comments",
+        "Get Feedback Comments",
         "GET",
-        "/bugs/{id}/comments",
-        func (w http.ResponseWriter, r *http.Request) {
-					controller.GetFeedbackComments(w, r, "bugs")
-				},
-    },
-    Route{
-        "Create Evolution Comment",
-        "POST",
-        "/evolutions/{id}/comments",
-        func (w http.ResponseWriter, r *http.Request) {
-					controller.CreateComment(w, r, "evolutions")
-				},
-    },
-    Route{
-        "Update Evolution Comment",
-        "PUT",
-        "/evolutions/{id}/comments/{comment_id}",
-        func (w http.ResponseWriter, r *http.Request) {
-					controller.UpdateComment(w, r, "evolutions")
-				},
-    },
-    Route{
-        "Add Label to Evolution",
-        "POST",
-        "/evolutions/{feedback_id}/labels/{label_id}",
-        controller.AddLabelToEvolution,
-    },
-    Route{
-        "Remove Label from Evolution",
-        "DELETE",
-        "/evolutions/{feedback_id}/labels/{label_id}",
-        controller.RemoveLabelFromEvolution,
-    },
-    Route{
-        "Delete Evolution Comment",
-        "DELETE",
-        "/evolutions/{id}/comments/{comment_id}",
-        func (w http.ResponseWriter, r *http.Request) {
-					controller.DeleteComment(w, r, "evolutions")
-				},
-    },
-    Route{
-        "Get Evolution Comments",
-        "GET",
-        "/evolutions/{id}/comments",
-        func (w http.ResponseWriter, r *http.Request) {
-					controller.GetFeedbackComments(w, r, "evolutions")
-				},
+        "/feedbacks/{id}/comments",
+        comment.GetFeedbackCommentsAction,
     },
     Route{
         "Create Label",
         "POST",
         "/labels",
-        func (w http.ResponseWriter, r *http.Request) {
-					controller.CreateLabel(w, r)
-				},
+        label.CreateLabelAction,
     },
     Route{
         "Update Label",
         "PUT",
         "/labels/{id}",
-        func (w http.ResponseWriter, r *http.Request) {
-					controller.UpdateLabel(w, r)
-				},
+        label.UpdateLabelAction,
     },
     Route{
         "Delete Label",
         "DELETE",
         "/labels/{id}",
-        func (w http.ResponseWriter, r *http.Request) {
-					controller.DeleteLabel(w, r)
-				},
+        label.DeleteLabelAction,
     },
     Route{
         "Get Labels",
         "GET",
         "/labels",
-        func (w http.ResponseWriter, r *http.Request) {
-					controller.GetLabels(w, r)
-				},
+        label.GetLabelsAction,
     },
 }
