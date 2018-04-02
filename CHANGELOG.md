@@ -1,3 +1,8 @@
+## [0.2.0] - 2018-04-02
+### Changed
+- Merge bugs and evolutions
+- Packages architecture
+
 ## [0.1.1] - 2017-12-25
 ### Added
 - Labels CRUD
