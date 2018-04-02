@@ -1,7 +1,7 @@
 package main
 
 import(
-    "ct-feedback-manager/manager"
+    "ct-feedback-manager/mongo"
     "log"
     "net/http"
     "fmt"
@@ -9,12 +9,8 @@ import(
 )
 
 func main() {
-    fmt.Println("MongoDB server initialization")
+    defer mongo.Connection.Close()
 
-    manager.InitMongo()
-    defer manager.MongoDBConnection.Close()
-
-    fmt.Println("MongoDB is ready")
     fmt.Println("Router initialization")
 
     router := NewRouter()

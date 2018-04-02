@@ -1,9 +1,9 @@
-package exception;
+package exception
 
 type NotFoundException struct {
-  Error error
-  Message string 
-  Code int
+    Error error
+    Message string
+    Code int
 }
 
 func NewNotFoundException(message string) NotFoundException {
