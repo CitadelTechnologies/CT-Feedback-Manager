@@ -27,7 +27,7 @@ func GetFeedbacks() []Feedback {
 
 func SearchFeedbacks(title string) []Feedback {
   	feedbacks := make([]Feedback, 0)
-  	if err := mongo.Database.C("feedbacks").Find(bson.M{"title": &bson.RegEx{Pattern: title}}).Sort("-updatedat").All(&feedbacks); err != nil {
+  	if err := mongo.Database.C("feedbacks").Find(bson.M{"title": &bson.RegEx{Pattern: title, Options: "i"}}).Sort("-updatedat").All(&feedbacks); err != nil {
 		panic(err)
     }
 	for key, feedback := range feedbacks {
