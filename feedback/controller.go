@@ -20,6 +20,33 @@ func GetFeedbacksAction(w http.ResponseWriter, r *http.Request) {
     }
 }
 
+func SearchFeedbacksAction(w http.ResponseWriter, r *http.Request) {
+    var body []byte
+    var err error
+    if body, err = ioutil.ReadAll(io.LimitReader(r.Body, 1048576)); err != nil {
+        panic(err)
+    }
+    if err = r.Body.Close(); err != nil {
+        panic(err)
+    }
+    var data map[string]string
+    if err = json.Unmarshal(body, &data); err != nil {
+        w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+        w.WriteHeader(http.StatusUnprocessableEntity)
+        if err = json.NewEncoder(w).Encode(err); err != nil {
+    		panic(err)
+        }
+    }
+    feedbacks := SearchFeedbacks(data["title"])
+
+    w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+    w.Header().Set("Access-Control-Allow-Origin", "*")
+
+    if err := json.NewEncoder(w).Encode(feedbacks); err != nil {
+        panic(err)
+    }
+}
+
 func GetFeedbackAction(w http.ResponseWriter, r *http.Request) {
     vars := mux.Vars(r)
 
