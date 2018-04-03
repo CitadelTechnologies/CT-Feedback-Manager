@@ -25,6 +25,20 @@ func GetFeedbacks() []Feedback {
     return feedbacks
 }
 
+func SearchFeedbacks(title string) []Feedback {
+  	feedbacks := make([]Feedback, 0)
+  	if err := mongo.Database.C("feedbacks").Find(bson.M{"title": &bson.RegEx{Pattern: title}}).Sort("-updatedat").All(&feedbacks); err != nil {
+		panic(err)
+    }
+	for key, feedback := range feedbacks {
+		feedbacks[key].Labels = make(label.Labels, 0)
+		for _, labelId := range feedback.LabelIds {
+			feedbacks[key].Labels = append(feedbacks[key].Labels, label.GetLabel(labelId.Hex()))
+		}
+	}
+    return feedbacks
+}
+
 func GetFeedback(id string) *Feedback {
   	var feedback Feedback
 	var identifier bson.M

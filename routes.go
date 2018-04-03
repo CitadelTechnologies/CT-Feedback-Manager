@@ -54,6 +54,12 @@ var routes = Routes{
 		feedback.GetFeedbacksAction,
 	},
 	Route{
+		"Search Feedbacks",
+		"POST",
+		"/feedbacks/search",
+		feedback.SearchFeedbacksAction,
+	},
+	Route{
 		"Get Feedback",
 		"GET",
 		"/feedbacks/{id}",
